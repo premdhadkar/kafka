@@ -1,0 +1,23 @@
+version: "3.5"
+services:
+  producer:
+    image: cnfltraining/jmx-producer:1.0
+    container_name: producer
+    hostname: producer
+    build: producer
+    networks:
+      - confluent
+    ports:
+      - "4444:4444"
+  consumer:
+    image: cnfltraining/jmx-consumer:1.0
+    container_name: consumer
+    hostname: consumer
+    build: consumer
+    networks:
+      - confluent
+    ports:
+      - "4445:4445"
+
+networks:
+  confluent:

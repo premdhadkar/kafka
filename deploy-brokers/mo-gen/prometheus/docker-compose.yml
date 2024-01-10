@@ -1,0 +1,93 @@
+version: "3.5"
+services:
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.1.1-1-ubi8
+    container_name: zookeeper
+    hostname: zookeeper
+    networks:
+      - confluent
+    ports:
+      - "2181:2181"
+    environment:
+      ZOOKEEPER_SERVER_ID: 1
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+      ZOOKEEPER_INIT_LIMIT: 5
+      ZOOKEEPER_SYNC_LIMIT: 2
+
+  kafka:
+    image: confluentinc/cp-server:7.1.1-1-ubi8
+    container_name: kafka
+    hostname: kafka
+    networks:
+      - confluent
+    ports:
+      - "9092:9092"
+      - "7071:7071"
+      - "9999:9999"
+    volumes:
+      - ./agents:/agents
+    environment:
+      KAFKA_BROKER_ID: 101
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+      KAFKA_DELETE_TOPIC_ENABLE: "true"
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_LOG_RETENTION_HOURS: 1
+      KAFKA_LOG_SEGMENT_BYTES: 536870912
+      KAFKA_LOG_RETENTION_BYTES: 536870912
+      KAFKA_JMX_PORT: 9999
+      KAFKA_JMX_HOSTNAME: 127.0.0.1
+      KAFKA_OPTS: "-javaagent:/agents/jmx_prometheus_javaagent-0.12.0.jar=7071:/agents/kafka.yml"
+
+  prometheus:
+    image: prom/prometheus:v2.17.0
+    container_name: prometheus
+    hostname: prometheus
+    networks:
+      - confluent
+    ports:
+      - "9090:9090/tcp"
+    volumes:
+      - ./prometheus:/etc/prometheus
+
+  grafana:
+    image: grafana/grafana:6.7.2
+    container_name: grafana
+    hostname: grafana
+    networks:
+      - confluent
+    ports:
+      - "3000:3000/tcp"
+    volumes:
+      - grafana-storage:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning
+      - ./grafana/dashboards:/var/lib/grafana/dashboards
+
+  control-center:
+    image: confluentinc/cp-enterprise-control-center:7.1.1-1-ubi8
+    container_name: control-center
+    hostname: control-center
+    restart: always
+    networks:
+      - confluent
+    ports:
+      - "9021:9021"
+    environment:
+      CONTROL_CENTER_BOOTSTRAP_SERVERS: kafka:9092
+      CONTROL_CENTER_KAFKA_CAO_BOOTSTRAP_SERVERS: kafka:9092
+      CONTROL_CENTER_REPLICATION_FACTOR: 1
+      CONTROL_CENTER_MONITORING_INTERCEPTOR_TOPIC_REPLICATION: 1
+      CONTROL_CENTER_INTERNAL_TOPICS_REPLICATION: 1
+      CONTROL_CENTER_COMMAND_TOPIC_REPLICATION: 1
+      CONTROL_CENTER_METRICS_TOPIC_REPLICATION: 1
+      CONTROL_CENTER_STREAMS_NUM_STREAM_THREADS: 1
+      CONTROL_CENTER_STREAMS_CONSUMER_REQUEST_TIMEOUT_MS: "960032"
+      CONTROL_CENTER_UI_AUTOUPDATE_ENABLE: "false"
+
+volumes:
+  grafana-storage:
+
+networks:
+  confluent:
