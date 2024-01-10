@@ -57,9 +57,9 @@ services:
     environment:
       KAFKA_BROKER_ID: 102
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_LISTENERS: CLIENT://kafka-2:9092,BROKER://kafka-2:9094
-      KAFKA_ADVERTISED_LISTENERS: CLIENT://kafka-2:9092,BROKER://kafka-2:9094
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CLIENT:PLAINTEXT,BROKER:SASL_PLAINTEXT
+      KAFKA_LISTENERS: CLIENT://kafka-2:9092,BROKER://kafka-2:9094,CONTROLLER://kafka-2:9095
+      KAFKA_ADVERTISED_LISTENERS: CLIENT://kafka-2:9092,BROKER://kafka-2:9094,CONTROLLER://kafka-2:9095
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CLIENT:PLAINTEXT,BROKER:SASL_PLAINTEXT,CONTROLLER:SASL_PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: BROKER
       KAFKA_SASL_MECHANISM_INTER_BROKER_PROTOCOL: PLAIN
       KAFKA_SASL_ENABLED_MECHANISMS: PLAIN
@@ -68,6 +68,8 @@ services:
         username="kafka" \
         password="kafka-secret" \
         user_kafka="kafka-secret";
+      KAFKA_CONTROL_PLANE_LISTENER_NAME: CONTROLLER
+      KAFKA_LISTENER_NAME_CONTROLLER_PLAIN_SASL_JAAS_CONFIG: org.apache.kafka.common.security.plain.PlainLoginModule required username="kafka" password="kafka-secret" user_kafka="kafka-secret";
       KAFKA_METRIC_REPORTERS: "io.confluent.metrics.reporter.ConfluentMetricsReporter"
       CONFLUENT_METRICS_REPORTER_BOOTSTRAP_SERVERS: "kafka-1:9092,kafka-2:9092,kafka-3:9092"
 
@@ -82,9 +84,9 @@ services:
     environment:
       KAFKA_BROKER_ID: 103
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_LISTENERS: CLIENT://kafka-3:9092,BROKER://kafka-3:9094
-      KAFKA_ADVERTISED_LISTENERS: CLIENT://kafka-3:9092,BROKER://kafka-3:9094
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CLIENT:PLAINTEXT,BROKER:SASL_PLAINTEXT
+      KAFKA_LISTENERS: CLIENT://kafka-3:9092,BROKER://kafka-3:9094,CONTROLLER://kafka-3:9095
+      KAFKA_ADVERTISED_LISTENERS: CLIENT://kafka-3:9092,BROKER://kafka-3:9094,CONTROLLER://kafka-3:9095
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CLIENT:PLAINTEXT,BROKER:SASL_PLAINTEXT,CONTROLLER:SASL_PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: BROKER
       KAFKA_SASL_MECHANISM_INTER_BROKER_PROTOCOL: PLAIN
       KAFKA_SASL_ENABLED_MECHANISMS: PLAIN
@@ -93,6 +95,8 @@ services:
         username="kafka" \
         password="kafka-secret" \
         user_kafka="kafka-secret";
+      KAFKA_CONTROL_PLANE_LISTENER_NAME: CONTROLLER
+      KAFKA_LISTENER_NAME_CONTROLLER_PLAIN_SASL_JAAS_CONFIG: org.apache.kafka.common.security.plain.PlainLoginModule required username="kafka" password="kafka-secret" user_kafka="kafka-secret";
       KAFKA_METRIC_REPORTERS: "io.confluent.metrics.reporter.ConfluentMetricsReporter"
       CONFLUENT_METRICS_REPORTER_BOOTSTRAP_SERVERS: "kafka-1:9092,kafka-2:9092,kafka-3:9092"
 
